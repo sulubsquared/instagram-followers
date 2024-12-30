@@ -9,6 +9,13 @@ if (!username) {
     showError('hey you need to give me a username!');
 } else {
     fetchData();
+    updateProfileInfo();
+}
+
+// update the profile section with basic info
+function updateProfileInfo() {
+    // update username
+    document.getElementById('profileUsername').textContent = `@${username}`;
 }
 
 // get all the data from the server
@@ -33,6 +40,12 @@ async function fetchData() {
         let newest = data[0];
         let currentFollowers = new Set(newest.followers);
         let currentFollowing = new Set(newest.following);
+        
+        // update follower and following counts in profile section
+        document.getElementById('followerCount').textContent = 
+            formatNumber(currentFollowers.size);
+        document.getElementById('followingCount').textContent = 
+            formatNumber(currentFollowing.size);
         
         // show when we got the data
         document.getElementById('timestamp').textContent = 
@@ -87,6 +100,17 @@ async function fetchData() {
         console.log('uh oh something went wrong:', error);
         showError('failed to get data: ' + error.message);
     }
+}
+
+// format numbers to be more readable (e.g., 1.2k)
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
 }
 
 // show a list of users
