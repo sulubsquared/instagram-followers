@@ -28,6 +28,9 @@ node server/server.js
    - Click "Load unpacked"
    - Select the extension directory
 
+5. Load the extension in Chrome:
+   - Or simply just run the ```start.bat``` file
+
 ## Usage
 
 1. Make sure the local server is running
