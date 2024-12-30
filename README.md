@@ -1,4 +1,5 @@
 # Follower Tracker for Instagram
+![image](https://github.com/user-attachments/assets/c0977288-2ad6-4aa7-9417-4ea4567c0322)
 
 Track your Instagram followers and see who unfollowed you. This Chrome extension helps you keep track of your Instagram followers and following.
 
