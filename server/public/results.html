@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram Follower Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #262626;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dbdbdb;
+        }
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .user-item {
+            padding: 8px;
+            border-bottom: 1px solid #efefef;
+        }
+        .user-item:hover {
+            background-color: #fafafa;
+        }
+        .timestamp {
+            color: #8e8e8e;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Follower Analysis</h1>
+        <div id="timestamp" class="timestamp"></div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <h2>Not Following Back</h2>
+                <div id="notFollowingBack" class="user-list"></div>
+            </div>
+            
+            <div class="stat-box">
+                <h2>You Don't Follow Back</h2>
+                <div id="youDontFollowBack" class="user-list"></div>
+            </div>
+            
+            <div class="stat-box">
+                <h2>Recent Unfollowers</h2>
+                <div id="recentUnfollowers" class="user-list"></div>
+            </div>
+            
+            <div class="stat-box">
+                <h2>Recent New Followers</h2>
+                <div id="recentNewFollowers" class="user-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const username = window.location.pathname.split('/').pop();
+        
+        async function fetchData() {
+            try {
+                const response = await fetch(`/api/follower-data/${username}`);
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    const current = new Set(data[0].followers);
+                    const currentFollowing = new Set(data[0].following);
+                    
+                    // Update timestamp
+                    document.getElementById('timestamp').textContent = 
+                        `Last updated: ${new Date(data[0].timestamp).toLocaleString()}`;
+                    
+                    // Not following back
+                    const notFollowingBack = Array.from(currentFollowing)
+                        .filter(user => !current.has(user));
+                    updateList('notFollowingBack', notFollowingBack);
+                    
+                    // You don't follow back
+                    const youDontFollowBack = Array.from(current)
+                        .filter(user => !currentFollowing.has(user));
+                    updateList('youDontFollowBack', youDontFollowBack);
+                    
+                    // Compare with previous data if available
+                    if (data.length > 1) {
+                        const previous = new Set(data[1].followers);
+                        
+                        // Recent unfollowers
+                        const recentUnfollowers = Array.from(previous)
+                            .filter(user => !current.has(user));
+                        updateList('recentUnfollowers', recentUnfollowers);
+                        
+                        // Recent new followers
+                        const recentNewFollowers = Array.from(current)
+                            .filter(user => !previous.has(user));
+                        updateList('recentNewFollowers', recentNewFollowers);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        
+        function updateList(elementId, users) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = users.length > 0 
+                ? users.map(user => `<div class="user-item">@${user}</div>`).join('')
+                : '<div class="user-item">None</div>';
+        }
+        
+        fetchData();
+    </script>
+</body>
+</html>
